@@ -3,7 +3,7 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 import throttle from 'lodash.throttle';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 // import axios from 'axios';
-import {fetchImages, resetPages} from './js/fatch-images'
+import {fetchImages, resetPages} from './js/fetch-images'
 
 // import "simplelightbox/dist/simple-lightbox.min.css";
 // import { galleryItems } from './gallery-items';
@@ -12,6 +12,7 @@ const STORAGE_KEY = 'search-form-state';
 const form = document.querySelector('.search-form');
 const galleryAll = document.querySelector('.gallery');
 const btnLoadMore = document.querySelector('.load-more');
+const btnToTop = document.querySelector('.btn-to-top');
 // form.addEventListener('input', throttle(onFormInput, 300));
 form.addEventListener('submit', onFormSubmit);
 const lightbox = new SimpleLightbox('.gallery a', {
@@ -19,6 +20,7 @@ const lightbox = new SimpleLightbox('.gallery a', {
     captionsDelay: 250,
 })
 btnLoadMore.addEventListener('click', onClickLoadMoreBtn);
+btnToTop.addEventListener('click', onClickToTopBtn);
 // let formInput = {
 //     "searchQuery": '',
 // }
@@ -35,11 +37,13 @@ async function onFormSubmit(evt) {
     resetPages();
     searchText = evt.currentTarget.searchQuery.value.trim();
     console.log(searchText);
-    const {hits} = await fetchImages(searchText);
+    const {totalHits, hits} = await fetchImages(searchText);
     evt.target.reset();
-
+    // const hitsLength = hits.length;
     if (hits.length === 0 ) {
-        alert("Sorry, there are no images matching your search query. Please try again.");
+        alertNoImagesFound();
+    } else {
+        alertYesImagesFound(totalHits);
     }
     renderCards(hits);
     lightbox.refresh();
@@ -48,25 +52,26 @@ async function onFormSubmit(evt) {
 //  разметки карточки одного изображения для галереи
 
 function createCards(cards) {
-    return cards.map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => `<div class="photo-card">
-    <a href="${largeImageURL}">
-  <img src="${webformatURL}" alt="${tags}" loading="lazy" />
-  <div class="info">
+    return cards.map(({ webformatURL, largeImageURL, tags, likes, views, comments, downloads }) => `
+    <a class="gallery__link" href="${largeImageURL}">
+    <div class="gallery-item">
+    <img class="gallery-item__img" src="${webformatURL}" alt="${tags}" loading="lazy" />
+    <div class="info">
     <p class="info-item">
-      <b>Likes: ${likes}</b>
+      <b>Likes: </b>${likes}
     </p>
     <p class="info-item">
-      <b>Views: ${views}</b>
+      <b>Views: </b>${views}
     </p>
     <p class="info-item">
-      <b>Comments: ${comments}</b>
+      <b>Comments: </b>${comments}
     </p>
     <p class="info-item">
-      <b>Downloads: ${downloads}</b>
+      <b>Downloads: </b>${downloads}
     </p>
+   </div> 
   </div>
-  </a>
-</div>`).join('');
+  </a>`).join('');
     
 }
 
@@ -84,4 +89,19 @@ async function onClickLoadMoreBtn() {
     renderCards(hits);
     lightbox.refresh();
     
+}
+
+function onClickToTopBtn() {
+    //  window.scrollTo(screenX, 0);
+    if (window.pageYOffset > 0) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function alertNoImagesFound() {
+    Notify.failure('Sorry, there are no images matching your search query. Please try again.');
+}
+
+function alertYesImagesFound(hits) {
+    Notify.success(`Hooray! We found ${hits} images.`);
 }
