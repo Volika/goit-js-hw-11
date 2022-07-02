@@ -1,18 +1,19 @@
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
-import throttle from 'lodash.throttle';
+// import throttle from 'lodash.throttle';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 // import axios from 'axios';
 import {fetchImages, resetPages} from './js/fetch-images'
 
 // import "simplelightbox/dist/simple-lightbox.min.css";
 // import { galleryItems } from './gallery-items';
-const STORAGE_KEY = 'search-form-state';
+// const STORAGE_KEY = 'search-form-state';
 
 const form = document.querySelector('.search-form');
 const galleryAll = document.querySelector('.gallery');
 const btnLoadMore = document.querySelector('.load-more');
 const btnToTop = document.querySelector('.btn-to-top');
+const endOfSerch = document.querySelector('.end-of-serch');
 // form.addEventListener('input', throttle(onFormInput, 300));
 form.addEventListener('submit', onFormSubmit);
 const lightbox = new SimpleLightbox('.gallery a', {
@@ -31,23 +32,35 @@ let searchText = '';
 //     localStorage.setItem(STORAGE_KEY, JSON.stringify(formInput));
 // }
 
+const perPage = 40;
+let totalPages = 1;
 async function onFormSubmit(evt) {
     evt.preventDefault();
     clearCardsContainer();
-    resetPages();
+  resetPages();
+  totalPages = 0;
+  btnLoadMore.classList.add('is-hidden');
+  endOfSerch.classList.add('is-hidden');
     searchText = evt.currentTarget.searchQuery.value.trim();
-    console.log(searchText);
+    
     const {totalHits, hits} = await fetchImages(searchText);
     evt.target.reset();
+  
     // const hitsLength = hits.length;
-    if (hits.length === 0 ) {
-        alertNoImagesFound();
+  if (hits.length === 0) {
+      alertNoImagesFound();
     } else {
-        alertYesImagesFound(totalHits);
-    }
+      alertYesImagesFound(totalHits);
+      totalPages = Math.ceil(totalHits / perPage);
+  }
+  console.log(searchText, totalHits, hits.length, totalPages);
+  
+        if (totalHits > perPage) {
+          btnLoadMore.classList.remove('is-hidden');
+  }
     renderCards(hits);
     lightbox.refresh();
-
+  // console.log(totalPages);
 }
 //  разметки карточки одного изображения для галереи
 
@@ -83,12 +96,26 @@ function clearCardsContainer() {
     galleryAll.innerHTML = '';
 }
 
-async function onClickLoadMoreBtn() {
-    console.log("onClickLoadMoreBtn");
-    const {hits} = await fetchImages(searchText);
-    renderCards(hits);
-    lightbox.refresh();
-    
+async function onClickLoadMoreBtn(evt) {
+  console.log("onClickLoadMoreBtn");
+    totalPages -= 1;
+  console.log(totalPages);
+  const { hits } = await fetchImages(searchText);
+  renderCards(hits);
+ 
+  // page += 1;
+      if (totalPages === 1) {
+        btnLoadMore.classList.add('is-hidden');
+        alertEndOfSearch();
+      }
+
+  lightbox.refresh();
+  
+      if (totalPages === 1) {
+
+        
+      }
+
 }
 
 function onClickToTopBtn() {
@@ -105,3 +132,10 @@ function alertNoImagesFound() {
 function alertYesImagesFound(hits) {
     Notify.success(`Hooray! We found ${hits} images.`);
 }
+
+function alertEndOfSearch() {
+  // endOfSerch
+  endOfSerch.classList.remove('is-hidden');
+  // Notify.failure("We're sorry, but you've reached the end of search results.");
+}
+

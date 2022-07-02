@@ -27,6 +27,7 @@ async function fetchImages(query) {
         `?${optionParam}`
     );
     page += 1;
+    
     return data;
 }
 
