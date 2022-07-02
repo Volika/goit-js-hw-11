@@ -41,6 +41,7 @@ async function onFormSubmit(evt) {
   totalPages = 0;
   btnLoadMore.classList.add('is-hidden');
   endOfSerch.classList.add('is-hidden');
+  btnToTop.style.display = 'none';
     searchText = evt.currentTarget.searchQuery.value.trim();
     
     const {totalHits, hits} = await fetchImages(searchText);
@@ -53,11 +54,12 @@ async function onFormSubmit(evt) {
       alertYesImagesFound(totalHits);
       totalPages = Math.ceil(totalHits / perPage);
   }
-  console.log(searchText, totalHits, hits.length, totalPages);
+  // console.log(searchText, totalHits, hits.length, totalPages);
   
         if (totalHits > perPage) {
           btnLoadMore.classList.remove('is-hidden');
-  }
+        }
+    window.addEventListener("scroll", onWindowScroll );
     renderCards(hits);
     lightbox.refresh();
   // console.log(totalPages);
@@ -97,32 +99,31 @@ function clearCardsContainer() {
 }
 
 async function onClickLoadMoreBtn(evt) {
-  console.log("onClickLoadMoreBtn");
+  // console.log("onClickLoadMoreBtn");
     totalPages -= 1;
-  console.log(totalPages);
+  // console.log(totalPages);
   const { hits } = await fetchImages(searchText);
   renderCards(hits);
  
-  // page += 1;
       if (totalPages === 1) {
         btnLoadMore.classList.add('is-hidden');
         alertEndOfSearch();
       }
-
   lightbox.refresh();
-  
-      if (totalPages === 1) {
-
-        
-      }
-
 }
 
 function onClickToTopBtn() {
-    //  window.scrollTo(screenX, 0);
-    if (window.pageYOffset > 0) {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+  
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+ 
+ btnToTop.style.display = 'none';
+  // window.scrollTo(0, 0);
+}
+
+
+function onWindowScroll() {
+   btnToTop.style.display = 'block';
+  // btnToTop.classList.remove('is-hidden');
 }
 
 function alertNoImagesFound() {

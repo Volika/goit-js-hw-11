@@ -50,13 +50,16 @@ ul {
 }
 
 .search-form input {
+    font-weight: 700;
+    font-size: 18px;
+
     width: 20%;
     border-radius: 4px 0 0 4px;
     border: none;
     outline: none;
     background-color: #fff;
     padding: 8px 10px;
-    font: inherit;
+    // font: inherit;
 }
 
 .search-form button {
@@ -134,7 +137,7 @@ display: flex;
     padding: 8px 20px;
     border: none;
     border-radius: 5px;
-    // background-color: #fbfbfb;
+  
     background-color: #72bcec;
     box-shadow: 0 1px 2px 0 rgb(60 64 67 / 30%), 0 2px 6px 2px rgb(60 64 67 / 15%);
     font: inherit;
@@ -154,4 +157,24 @@ display: flex;
         box-shadow: 0 1px 2px 0 rgb(60 64 67 / 30%), 0 2px 6px 2px rgb(60 64 67 / 15%);
         font: inherit;
         color: rgb(0, 0, 0);
+}
+
+.btn-to-top {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 30px;
+    z-index: 50;
+    width: 70px;
+    height: 70px;
+    
+    align-items: center;
+    justify-content: center;
+
+    background-color: #3275ac;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    color:#fff;
+    font-size: 20px;
 }
