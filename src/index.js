@@ -120,10 +120,19 @@ function onClickToTopBtn() {
   // window.scrollTo(0, 0);
 }
 
-
 function onWindowScroll() {
-   btnToTop.style.display = 'block';
-  // btnToTop.classList.remove('is-hidden');
+  // btnToTop.style.display = 'block';
+   // btnToTop.classList.remove('is-hidden');
+  const scrolled = window.pageYOffset;
+  const coords = document.documentElement.clientHeight;
+
+  if (scrolled > coords) {
+  btnToTop.style.display = 'block';
+  }
+  if (scrolled < coords) {
+    btnToTop.style.display = 'none';
+  }
+
 }
 
 function alertNoImagesFound() {
